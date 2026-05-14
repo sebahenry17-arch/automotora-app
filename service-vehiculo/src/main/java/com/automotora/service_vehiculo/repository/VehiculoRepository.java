@@ -26,8 +26,15 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
     // Vehículos con ficha técnica asociada
     @Query("""
            SELECT v FROM Vehiculo v
-           JOIN FETCH v.fichaVehiculo f
+           JOIN FETCH v.ficha f
            WHERE f IS NOT NULL
            """)
     List<Vehiculo> findVehiculosConFichaCompleta();
+
+    // 🚗 Vehículos con tipo cargado (evita nombre = null)
+    @Query("""
+           SELECT v FROM Vehiculo v
+           JOIN FETCH v.tipoVehiculo
+           """)
+    List<Vehiculo> findAllConTipoVehiculo();
 }

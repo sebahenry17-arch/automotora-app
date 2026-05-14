@@ -2,6 +2,8 @@ package com.automotora.service_vehiculo.model;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -29,5 +31,6 @@ public class FichaVehiculo {
 
     @OneToOne
     @JoinColumn(name = "vehiculo_id")
+    @JsonIgnore 
     private Vehiculo vehiculo;
 }
