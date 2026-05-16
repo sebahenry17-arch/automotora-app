@@ -11,8 +11,10 @@ import com.automotora.service_vehiculo.model.Vehiculo;
 @Repository
 public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
 
-    // Buscar por marca y modelo
-    Vehiculo findByMarcaAndModelo(String marca, String modelo);
+       List<Vehiculo> findByMarca(String marca);
+
+    // Buscar por modelo y año
+    List<Vehiculo> findByModeloAndAño(String modelo, int año);
 
     // Reporte: conteo de vehículos por tipo
     @Query("""
@@ -23,18 +25,11 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
            """)
     List<Object[]> conteoPorTipoVehiculo();
 
-    // Vehículos con ficha técnica asociada
-    @Query("""
-           SELECT v FROM Vehiculo v
-           JOIN FETCH v.ficha f
-           WHERE f IS NOT NULL
-           """)
-    List<Vehiculo> findVehiculosConFichaCompleta();
-
+   
     // 🚗 Vehículos con tipo cargado (evita nombre = null)
     @Query("""
            SELECT v FROM Vehiculo v
            JOIN FETCH v.tipoVehiculo
            """)
-    List<Vehiculo> findAllConTipoVehiculo();
+       List<Vehiculo> findAllConTipoVehiculo();
 }
