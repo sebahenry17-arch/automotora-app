@@ -22,11 +22,13 @@ public class VehiculoController {
     @Autowired
     private VehiculoService vehiculoService;
 
+    // 🔹 Listar todos los vehículos
     @GetMapping
     public List<Vehiculo> listar() {
-        return vehiculoService.listarTodos();
+        return vehiculoService.listarVehiculos();
     }
 
+    // 🔹 Obtener vehículo por ID
     @GetMapping("/{id}")
     public ResponseEntity<Vehiculo> obtener(@PathVariable Long id) {
         return vehiculoService.buscarPorId(id)
@@ -34,14 +36,27 @@ public class VehiculoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    // 🔹 Crear nuevo vehículo
     @PostMapping
-    public ResponseEntity<Vehiculo> crear(@RequestBody Vehiculo vehiculo) {
-        return ResponseEntity.ok(vehiculoService.guardar(vehiculo));
+    public ResponseEntity<?> crear(@RequestBody Vehiculo vehiculo) {
+        try {
+            Vehiculo nuevo = vehiculoService.crearVehiculo(vehiculo);
+            return ResponseEntity.ok(nuevo);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
+    // 🔹 Eliminar vehículo por ID
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         vehiculoService.eliminar(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // 🔹 Conteo simple por tipo de vehículo
+    @GetMapping("/conteo")
+    public List<Object[]> conteoPorTipoVehiculo() {
+        return vehiculoService.conteoPorTipoVehiculo();
     }
 }
