@@ -34,4 +34,5 @@ public class Venta {
 
     @Transient
     private Object datosFichaVehiculo;
+
 }
