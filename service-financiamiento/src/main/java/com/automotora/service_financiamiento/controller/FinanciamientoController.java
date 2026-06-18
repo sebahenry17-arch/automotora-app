@@ -40,3 +40,4 @@ public class FinanciamientoController {
     public void eliminar(@PathVariable Long id) {
         financiamientoService.eliminarFinanciamiento(id);
     }
+}

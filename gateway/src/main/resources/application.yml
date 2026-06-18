@@ -1,0 +1,32 @@
+server:
+  port: 9090   # Puerto donde corre el Gateway
+
+spring:
+  application:
+    name: gateway-service
+
+  cloud:
+    gateway:
+      routes:
+        - id: cliente-service
+          uri: http://localhost:9001
+          predicates:
+            - Path=/clientes/**
+        - id: vehiculo-service
+          uri: http://localhost:9002
+          predicates:
+            - Path=/vehiculos/**
+        - id: paciente-service
+          uri: http://localhost:9003
+          predicates:
+            - Path=/pacientes/**
+
+    discovery:
+      locator:
+        enabled: true   # Permite que el Gateway descubra servicios en Eureka automáticamente
+        lower-case-service-id: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

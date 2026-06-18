@@ -17,7 +17,7 @@ import com.automotora.service_ficha.model.FichaVehiculo;
 import com.automotora.service_ficha.service.FichaVehiculoService;
 
 @RestController
-@RequestMapping("/fichas")
+@RequestMapping("/api/v1/fichas/")
 public class FichaVehiculoController {
 
     @Autowired

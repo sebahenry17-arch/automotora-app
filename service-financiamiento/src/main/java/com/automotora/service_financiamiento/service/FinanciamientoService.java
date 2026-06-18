@@ -1,9 +1,13 @@
 package com.automotora.service_financiamiento.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.automotora.service_financiamiento.model.Financiamiento;
+import com.automotora.service_financiamiento.repository.FinanciamientoRepository;
 
 @Service
 public class FinanciamientoService {
