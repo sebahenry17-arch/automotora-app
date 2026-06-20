@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import com.automotora.service_vehiculo.model.Vehiculo;
 import com.automotora.service_vehiculo.repository.VehiculoRepository;
 
+import io.micrometer.common.lang.NonNull;
+import jakarta.transaction.Transactional;
+
 
 
 @Service
@@ -17,8 +20,20 @@ public class VehiculoService {
     @Autowired
     private VehiculoRepository vehiculoRepository;
 
+    public List<Vehiculo> listarVehiculos() {
+        // Si tu repo tiene un método custom con JOIN a TipoVehiculo
+        return vehiculoRepository.findAllConTipoVehiculo();
+        // Si no, simplemente:
+        // return vehiculoRepository.findAll();
+    }
+
+    public Optional<Vehiculo> buscarPorId(@NonNull Long id) {
+        return vehiculoRepository.findById(id);
+    }
+
+    @Transactional
     public Vehiculo crearVehiculo(Vehiculo vehiculo) {
-        // Validaciones de negocio
+        // Validaciones básicas (puedes moverlas a la entidad con Bean Validation)
         if (vehiculo.getMarca() == null || vehiculo.getMarca().isEmpty()) {
             throw new IllegalArgumentException("La marca no puede estar vacía");
         }
@@ -35,19 +50,12 @@ public class VehiculoService {
         return vehiculoRepository.save(vehiculo);
     }
 
-    public List<Vehiculo> listarVehiculos() {
-        return vehiculoRepository.findAllConTipoVehiculo();
+    @Transactional
+    public void eliminar(@NonNull Long id) {
+        vehiculoRepository.deleteById(id);
     }
 
     public List<Object[]> conteoPorTipoVehiculo() {
         return vehiculoRepository.conteoPorTipoVehiculo();
-    }
-    
-    public Optional<Vehiculo> buscarPorId(Long id) {
-        return vehiculoRepository.findById(id);
-    }
-
-    public void eliminar(Long id) {
-        vehiculoRepository.deleteById(id);
     }
 }
