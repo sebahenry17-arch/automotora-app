@@ -19,7 +19,8 @@
             "mainClass": "com.automotora.service_cliente.ServiceClienteApplication",
             "projectName": "service-cliente",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=51045 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=service-cliente"
         },
         {
             "type": "java",
@@ -28,6 +29,27 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.automotora.service_ficha.ServiceFichaApplication",
             "projectName": "service-ficha",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=51080 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=service-ficha"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceFinanciamientoApplication<service-financiamiento>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_financiamiento.ServiceFinanciamientoApplication",
+            "projectName": "service-financiamiento",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceVentasApplication<service-ventas>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_ventas.ServiceVentasApplication",
+            "projectName": "service-ventas",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

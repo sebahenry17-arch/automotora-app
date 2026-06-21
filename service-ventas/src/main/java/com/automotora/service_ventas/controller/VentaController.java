@@ -3,6 +3,10 @@ package com.automotora.service_ventas.controller;
 
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +14,7 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.*;
 
+import com.automotora.service_ventas.config.ErrorResponse;
 import com.automotora.service_ventas.model.Venta;
 import com.automotora.service_ventas.service.VentaService;
 
@@ -40,8 +45,19 @@ public class VentaController {
         return ventaService.listarTodas();
     }
 
-   @GetMapping("/{id}")
-@Operation(summary = "Obtener venta con links dinámicos a Cliente y FichaVehiculo")
+@GetMapping("/{id}")
+@Operation(
+    summary = "Obtener venta con links dinámicos a Cliente y FichaVehiculo",
+    description = "Devuelve una venta enriquecida con datos de Cliente y FichaVehiculo"
+)
+@ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Venta encontrada",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = Venta.class))),
+    @ApiResponse(responseCode = "404", description = "Venta no encontrada",
+        content = @Content(mediaType = "application/json",
+            schema = @Schema(implementation = ErrorResponse.class)))
+})
 public EntityModel<Venta> obtenerUna(@PathVariable Long id) {
     Venta venta = ventaService.buscarPorId(id);
 
