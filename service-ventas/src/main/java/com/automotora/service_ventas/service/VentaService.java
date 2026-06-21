@@ -30,7 +30,7 @@ public class VentaService {
                         .uri("http://localhost:9002/api/v1/clientes/" + venta.getClienteId())
                         .retrieve()
                         .bodyToMono(Object.class)
-                        .block(); // Bloqueamos para asegurar la validación antes del save
+                        .block();
 
                 venta.setDatosCliente(datosCliente);
             } catch (Exception e) {
@@ -58,14 +58,18 @@ public class VentaService {
         return ventaRepository.save(venta);
     }
 
-    // Listar todas las ventas
+    // Listar todas las ventas con enriquecimiento
     public List<Venta> listarTodas() {
-        return ventaRepository.findAll();
+        List<Venta> ventas = ventaRepository.findAll();
+        ventas.forEach(this::enriquecerVenta);
+        return ventas;
     }
 
-    // Buscar una venta por ID
-    public Optional<Venta> buscarPorId(Long id) {
-        return ventaRepository.findById(id);
+    // Buscar una venta por ID con enriquecimiento
+    public Venta buscarPorId(Long id) {
+        return ventaRepository.findById(id)
+                .map(this::enriquecerVenta)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
     }
 
     // Eliminar una venta por ID
@@ -75,5 +79,38 @@ public class VentaService {
         } else {
             throw new RuntimeException("Venta no encontrada con ID: " + id);
         }
+    }
+
+    // Método auxiliar para enriquecer una venta
+    private Venta enriquecerVenta(Venta venta) {
+        if (venta.getClienteId() != null) {
+            try {
+                Object cliente = webClientBuilder.build()
+                        .get()
+                        .uri("http://localhost:9002/api/v1/clientes/" + venta.getClienteId())
+                        .retrieve()
+                        .bodyToMono(Object.class)
+                        .block();
+                venta.setDatosCliente(cliente);
+            } catch (Exception e) {
+                venta.setDatosCliente("Información de cliente no disponible");
+            }
+        }
+
+        if (venta.getFichaId() != null) {
+            try {
+                Object ficha = webClientBuilder.build()
+                        .get()
+                        .uri("http://localhost:9003/api/v1/fichas/" + venta.getFichaId())
+                        .retrieve()
+                        .bodyToMono(Object.class)
+                        .block();
+                venta.setDatosFichaVehiculo(ficha);
+            } catch (Exception e) {
+                venta.setDatosFichaVehiculo("Información de ficha no disponible");
+            }
+        }
+
+        return venta;
     }
 }

@@ -2,7 +2,7 @@ package com.automotora.service_ventas.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -14,23 +14,23 @@ import java.time.LocalDateTime;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, ServerHttpRequest request) {
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
-            HttpStatus.BAD_REQUEST.value(),
-            ex.getMessage(),
-            request.getURI().toString(),
-            LocalDateTime.now().toString()
+            HttpStatus.NOT_FOUND.value(),                 // código HTTP
+            ex.getMessage(),                              // mensaje de la excepción
+            request.getRequestURI(),                      // ruta del endpoint
+            LocalDateTime.now().toString()                // timestamp
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, ServerHttpRequest request) {
+    public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex, HttpServletRequest request) {
         ErrorResponse error = new ErrorResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR.value(),
-            "Error interno del servidor",
-            request.getURI().toString(),
-            LocalDateTime.now().toString()
+            HttpStatus.INTERNAL_SERVER_ERROR.value(),     // código HTTP
+            "Error interno del servidor",                 // mensaje genérico
+            request.getRequestURI(),                      // ruta del endpoint
+            LocalDateTime.now().toString()                // timestamp
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
