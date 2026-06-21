@@ -52,6 +52,16 @@
             "projectName": "service-ventas",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceEmpleadoApplication<service-empleado>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_empleado.ServiceEmpleadoApplication",
+            "projectName": "service-empleado",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
