@@ -1,13 +1,13 @@
 package com.automotora.service_ficha.service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.automotora.service_ficha.dto.VehiculoDTO;
 import com.automotora.service_ficha.model.FichaVehiculo;
 import com.automotora.service_ficha.repository.FichaVehiculoRepository;
 
@@ -20,43 +20,43 @@ public class FichaVehiculoService {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-    public FichaVehiculoService(FichaVehiculoRepository repository, WebClient.Builder webClientBuilder) {
-        this.repository = repository;
-        this.webClientBuilder = webClientBuilder;
-    }
-
     // Crear ficha validando vehículo
     public FichaVehiculo guardarFicha(FichaVehiculo ficha) {
         if (ficha.getVehiculoId() != null) {
-            Object datosVehiculo = webClientBuilder.build()
+            VehiculoDTO datosVehiculo = webClientBuilder.build()
                 .get()
-                .uri("http://localhost:9001/vehiculos/" + ficha.getVehiculoId()) // 👈 puerto correcto
+                .uri("http://localhost:9001/vehiculos/" + ficha.getVehiculoId())
                 .retrieve()
-                .bodyToMono(Object.class)
+                .bodyToMono(VehiculoDTO.class)
                 .block();
 
             if (datosVehiculo == null) {
                 throw new RuntimeException("Vehículo no encontrado en el microservicio Vehículo");
             }
+
+            ficha.setDatosVehiculo(datosVehiculo);
         }
 
         ficha.setVendida(false); // por defecto
         return repository.save(ficha);
     }
 
-    // Listar todas
+    // Listar todas las fichas
     public List<FichaVehiculo> listarFichas() {
         return repository.findAll();
     }
 
-    // Buscar por ID
+    // Buscar ficha por ID
     public Optional<FichaVehiculo> buscarPorId(Long id) {
-        return repository.findById(id);
+        return repository.findById(id)
+            .map(this::enriquecerConVehiculo);
     }
 
-    // Buscar por vehiculoId
+    // Buscar fichas por vehiculoId
     public List<FichaVehiculo> buscarPorVehiculoId(Long vehiculoId) {
-        return repository.findByVehiculoId(vehiculoId);
+        List<FichaVehiculo> fichas = repository.findByVehiculoId(vehiculoId);
+        fichas.forEach(this::enriquecerConVehiculo);
+        return fichas;
     }
 
     // Actualizar ficha
@@ -69,26 +69,29 @@ public class FichaVehiculoService {
         repository.deleteById(id);
     }
 
-    // Ficha enriquecida con datos del vehículo
-    public Map<String, Object> obtenerFichaConVehiculo(Long idFicha) {
-        FichaVehiculo ficha = repository.findById(idFicha).orElse(null);
-        if (ficha == null) return null;
+    // Obtener ficha enriquecida con datos del vehículo
+    public FichaVehiculo obtenerFichaConVehiculo(Long idFicha) {
+        FichaVehiculo ficha = repository.findById(idFicha)
+            .orElseThrow(() -> new RuntimeException("Ficha no encontrada"));
+        return enriquecerConVehiculo(ficha);
+    }
 
-        Object vehiculo;
-        try {
-            vehiculo = webClientBuilder.build()
-                .get()
-                .uri("http://localhost:9001/vehiculos/" + ficha.getVehiculoId()) // 👈 puerto correcto
-                .retrieve()
-                .bodyToMono(Object.class)
-                .block();
-        } catch (Exception e) {
-            vehiculo = "Información de vehículo no disponible actualmente";
+    // Método privado para enriquecer con datos del microservicio Vehículo
+    private FichaVehiculo enriquecerConVehiculo(FichaVehiculo ficha) {
+        if (ficha.getVehiculoId() != null) {
+            try {
+                VehiculoDTO datosVehiculo = webClientBuilder.build()
+                    .get()
+                    .uri("http://localhost:9001/vehiculos/" + ficha.getVehiculoId())
+                    .retrieve()
+                    .bodyToMono(VehiculoDTO.class)
+                    .block();
+
+                ficha.setDatosVehiculo(datosVehiculo);
+            } catch (Exception e) {
+                ficha.setDatosVehiculo(null); // si falla la llamada, no rompe el flujo
+            }
         }
-
-        return Map.of(
-            "ficha", ficha,
-            "vehiculo", vehiculo
-        );
+        return ficha;
     }
 }
