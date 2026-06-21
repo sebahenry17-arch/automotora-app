@@ -13,9 +13,11 @@ import org.springframework.web.bind.annotation.*;
 import com.automotora.service_ventas.model.Venta;
 import com.automotora.service_ventas.service.VentaService;
 
+
 import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
 
 @RestController
 @RequestMapping("/api/v1/ventas")
@@ -38,29 +40,27 @@ public class VentaController {
         return ventaService.listarTodas();
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Obtener venta con links dinámicos a Cliente y FichaVehiculo")
-    public EntityModel<Venta> obtenerUna(@PathVariable Long id) {
-        // 1. Buscar la venta
-        Venta venta = ventaService.buscarPorId(id)
-                .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
+   @GetMapping("/{id}")
+@Operation(summary = "Obtener venta con links dinámicos a Cliente y FichaVehiculo")
+public EntityModel<Venta> obtenerUna(@PathVariable Long id) {
+    Venta venta = ventaService.buscarPorId(id);
 
-        // 2. Crear recurso HATEOAS
-        EntityModel<Venta> recurso = EntityModel.of(venta);
+    EntityModel<Venta> recurso = EntityModel.of(venta);
 
-        // 3. Link a sí mismo
-        recurso.add(linkTo(methodOn(VentaController.class).obtenerUna(id)).withSelfRel());
+    // Link a sí mismo
+    recurso.add(linkTo(methodOn(VentaController.class).obtenerUna(id)).withSelfRel());
 
-        // 4. Link dinámico al microservicio de Clientes (puerto 9002)
-        String urlCliente = "http://localhost:9002/api/v1/clientes/" + venta.getClienteId();
-        recurso.add(Link.of(urlCliente).withRel("detalle-cliente"));
+    // Link dinámico al microservicio Cliente (puerto 9002)
+    String urlCliente = "http://localhost:9002/api/v1/clientes/" + venta.getClienteId();
+    recurso.add(Link.of(urlCliente, "cliente"));
 
-        // 5. Link dinámico al microservicio de Fichas (puerto 9003)
-        String urlFicha = "http://localhost:9003/api/v1/fichas/" + venta.getFichaId();
-        recurso.add(Link.of(urlFicha).withRel("detalle-ficha"));
+    // Link dinámico al microservicio FichaVehiculo (puerto 9003)
+    String urlFicha = "http://localhost:9003/api/v1/fichas/" + venta.getFichaId();
+    recurso.add(Link.of(urlFicha, "fichaVehiculo"));
 
-        return recurso;
-    }
+    return recurso;
+}
+
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Eliminar una venta")
