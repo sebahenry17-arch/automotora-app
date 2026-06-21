@@ -1,68 +1,64 @@
 package com.automotora.service_ficha.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
+
+import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Operation;
 
 import com.automotora.service_ficha.model.FichaVehiculo;
 import com.automotora.service_ficha.service.FichaVehiculoService;
 
 @RestController
-@RequestMapping("/api/v1/fichas/")
+@RequestMapping("/api/v1/fichas")
+@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
+@Tag(name = "Fichas de Vehículos", description = "Endpoint para la gestión de fichas de vehículos con HATEOAS")
 public class FichaVehiculoController {
 
     @Autowired
-    private FichaVehiculoService service;
+    private FichaVehiculoService fichaService;
 
-    // Listar todas las fichas
-    @GetMapping
-    public List<FichaVehiculo> listarFichas() {
-        return service.listarFichas();
-    }
-
-    // Buscar ficha por ID
-    @GetMapping("/{id}")
-    public FichaVehiculo buscarPorId(@PathVariable Long id) {
-        return service.buscarPorId(id).orElse(null);
-    }
-
-    // Listar fichas de un vehículo específico
-    @GetMapping("/vehiculo/{vehiculoId}")
-    public List<FichaVehiculo> buscarPorVehiculoId(@PathVariable Long vehiculoId) {
-        return service.buscarPorVehiculoId(vehiculoId);
-    }
-
-    // Crear nueva ficha
     @PostMapping
-    public FichaVehiculo crearFicha(@RequestBody FichaVehiculo ficha) {
-        return service.guardarFicha(ficha);
+    @Operation(summary = "Crear una nueva ficha de vehículo")
+    public FichaVehiculo crear(@RequestBody FichaVehiculo ficha) {
+        return fichaService.guardarFicha(ficha);
     }
 
-    // Actualizar ficha existente
-    @PutMapping("/{id}")
-    public FichaVehiculo actualizarFicha(@PathVariable Long id, @RequestBody FichaVehiculo ficha) {
-        ficha.setId(id);
-        return service.actualizarFicha(ficha);
+    @GetMapping
+    @Operation(summary = "Listar todas las fichas de vehículos")
+    public List<FichaVehiculo> listar() {
+        return fichaService.listarFichas();
     }
 
-    // Eliminar ficha
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener ficha con link al microservicio de vehículos")
+    public EntityModel<FichaVehiculo> obtenerUna(@PathVariable Long id) {
+        // 1. Buscamos la ficha
+        FichaVehiculo ficha = fichaService.buscarPorId(id)
+                .orElseThrow(() -> new RuntimeException("Ficha no encontrada con ID: " + id));
+
+        // 2. Creamos el recurso HATEOAS
+        EntityModel<FichaVehiculo> recurso = EntityModel.of(ficha);
+
+        // 3. Link a sí mismo
+        recurso.add(linkTo(methodOn(FichaVehiculoController.class).obtenerUna(id)).withSelfRel());
+
+        // 4. Link dinámico al microservicio de Vehículos (vía API Gateway en puerto 9090)
+        String urlVehiculo = "http://localhost:9090/api/v1/vehiculos/" + ficha.getVehiculoId();
+        Link linkVehiculo = Link.of(urlVehiculo, "detalle-vehiculo");
+        recurso.add(linkVehiculo);
+
+        return recurso;
+    }
+
     @DeleteMapping("/{id}")
-    public void eliminarFicha(@PathVariable Long id) {
-        service.eliminarFicha(id);
-    }
-
-    //ficha + datos del vehículo
-    @GetMapping("/{id}/detalles")
-    public Map<String, Object> obtenerFichaConVehiculo(@PathVariable Long id) {
-        return service.obtenerFichaConVehiculo(id);
+    @Operation(summary = "Eliminar una ficha de vehículo")
+    public void eliminar(@PathVariable Long id) {
+        fichaService.eliminarFicha(id);
     }
 }

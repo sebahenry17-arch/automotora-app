@@ -20,6 +20,16 @@
             "projectName": "service-cliente",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceFichaApplication<service-ficha>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_ficha.ServiceFichaApplication",
+            "projectName": "service-ficha",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
