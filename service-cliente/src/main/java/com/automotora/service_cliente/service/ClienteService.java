@@ -40,6 +40,23 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
+    public Cliente actualizar(Long id, Cliente cliente) {
+        // 1. Buscar el cliente existente
+        Cliente existente = clienteRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Cliente con ID " + id + " no existe"));
+
+        // 2. Actualizar los campos
+        existente.setNombre(cliente.getNombre());
+        existente.setRut(cliente.getRut());
+        existente.setTelefono(cliente.getTelefono());
+        existente.setEmail(cliente.getEmail());
+        existente.setHistorialCompras(cliente.getHistorialCompras());
+
+        // 3. Guardar y devolver el actualizado
+        return clienteRepository.save(existente);
+    }
+
+
     // Obtener cliente por ID
     public Cliente obtenerClientePorId(Long id) {
         return clienteRepository.findById(id)
