@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,6 +68,32 @@ public class ClienteController {
 
     return recurso;
 }
+@PutMapping("/{id}")
+public ResponseEntity<EntityModel<Cliente>> actualizar(
+        @PathVariable Long id,
+        @RequestBody Cliente clienteActualizado) {
+
+    Cliente cliente = clienteService.obtenerClientePorId(id);
+    if (cliente == null) {
+        return ResponseEntity.notFound().build();
+    }
+
+    // Actualizar campos
+    cliente.setNombre(clienteActualizado.getNombre());
+    cliente.setRut(clienteActualizado.getRut());
+    cliente.setTelefono(clienteActualizado.getTelefono());
+    cliente.setEmail(clienteActualizado.getEmail());
+    cliente.setHistorialCompras(clienteActualizado.getHistorialCompras());
+
+    Cliente clienteGuardado = clienteService.crearCliente(cliente);
+
+    EntityModel<Cliente> recurso = EntityModel.of(clienteGuardado);
+    recurso.add(linkTo(methodOn(ClienteController.class).obtener(clienteGuardado.getId())).withSelfRel());
+    recurso.add(linkTo(methodOn(ClienteController.class).listar()).withRel("todos-los-clientes"));
+    recurso.add(linkTo(methodOn(ClienteController.class).eliminar(clienteGuardado.getId())).withRel("eliminar"));
+
+    return ResponseEntity.ok(recurso);
+}
 
     @Operation(summary = "Crear cliente", description = "Crea un nuevo cliente y devuelve enlaces")
     @PostMapping
@@ -78,6 +105,8 @@ public class ClienteController {
 
         return ResponseEntity.ok(recurso);
     }
+
+    
 
     @Operation(summary = "Eliminar cliente", description = "Elimina un cliente por ID")
     @DeleteMapping("/{id}")
