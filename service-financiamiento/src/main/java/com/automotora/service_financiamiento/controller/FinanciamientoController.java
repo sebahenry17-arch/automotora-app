@@ -20,7 +20,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/v1/financiamientos")
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+@CrossOrigin(origins = "*")
 @Tag(name = "Financiamientos", description = "Gestión de financiamientos con HATEOAS")
 public class FinanciamientoController {
 

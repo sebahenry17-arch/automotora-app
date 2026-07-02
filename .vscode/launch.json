@@ -41,7 +41,8 @@
             "mainClass": "com.automotora.service_financiamiento.ServiceFinanciamientoApplication",
             "projectName": "service-financiamiento",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote"
         },
         {
             "type": "java",
@@ -60,6 +61,57 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.automotora.service_empleado.ServiceEmpleadoApplication",
             "projectName": "service-empleado",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-GatewayApplication<gateway>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.gateway.GatewayApplication",
+            "projectName": "gateway",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceAuthApplication<service-auth>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_auth.ServiceAuthApplication",
+            "projectName": "service-auth",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceInventarioApplication<service-inventario>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_inventario.ServiceInventarioApplication",
+            "projectName": "service-inventario",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceMantenimientoApplication<service-mantenimiento>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_mantenimiento.ServiceMantenimientoApplication",
+            "projectName": "service-mantenimiento",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ServiceProveedorApplication<service-proveedor>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.automotora.service_proveedor.ServiceProveedorApplication",
+            "projectName": "service-proveedor",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

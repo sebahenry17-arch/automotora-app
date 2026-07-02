@@ -3,6 +3,7 @@ package com.automotora.service_vehiculo.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/vehiculo/tipos")
+@CrossOrigin(origins = "*")
 @Tag(name = "Tipos de Vehículos", description = "Operaciones relacionadas con los tipos de vehículos")
 public class TipoVehiculoController {
 

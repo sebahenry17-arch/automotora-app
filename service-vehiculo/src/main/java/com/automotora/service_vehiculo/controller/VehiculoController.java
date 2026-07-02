@@ -26,6 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/v1/vehiculo")
+@CrossOrigin(origins = "*")
 @Tag(name = "Vehículos", description = "Operaciones relacionadas con la gestión de vehículos con soporte HATEOAS")
 public class VehiculoController {
 
@@ -164,4 +165,26 @@ public ResponseEntity<?> obtener(@PathVariable Long id) {
             );
         }
     }
+    @Operation(
+        summary = "Actualizar vehículo",
+        description = "Actualiza un vehículo existente en la base de datos usando su ID y los nuevos datos enviados en el cuerpo de la petición."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Vehículo actualizado correctamente",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = Vehiculo.class))),
+        @ApiResponse(responseCode = "404", description = "Vehículo no encontrado",
+            content = @Content),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos",
+            content = @Content)
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Vehiculo> actualizarVehiculo(
+            @PathVariable Long id,
+            @RequestBody Vehiculo vehiculo) {
+
+        Vehiculo actualizado = vehiculoService.actualizarVehiculo(id, vehiculo);
+        return ResponseEntity.ok(actualizado);
+    }
+
 }

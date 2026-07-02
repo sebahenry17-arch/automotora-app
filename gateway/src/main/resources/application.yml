@@ -1,6 +1,9 @@
 server:
   port: 9090   # Puerto donde corre el Gateway
 
+jwt:
+  secret: "493358340235739058340598340598340598340598340598"
+
 spring:
   application:
     name: gateway-service
@@ -8,77 +11,117 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: vehiculo-service
-          uri: http://localhost:9001
-          predicates:
-            - Path=/api/v1/vehiculo/**
-        - id: cliente-service
-          uri: http://localhost:9002
-          predicates:
-            - Path=/api/v1/clientes/**
-        - id: ficha-service
-          uri: http://localhost:9003
-          predicates:
-            - Path=/api/v1/fichas/**
-        - id: ventas-service
-          uri: http://localhost:9004
-          predicates:
-            - Path=/api/v1/ventas/**
-        - id: financiamiento-service
-          uri: http://localhost:9005
-          predicates:
-            - Path=/api/v1/financiamientos/**
-        - id: empleado-service
-          uri: http://localhost:9006
-          predicates:
-            - Path=/api/v1/empleados/**
-        - id: mantenimiento-service
-          uri: http://localhost:9007
-          predicates:
-            - Path=/api/v1/mantenimientos/**
-        - id: inventario-service
-          uri: http://localhost:9008
-          predicates:
-            - Path=/api/v1/inventarios/**
-        - id: proveedor-service
-          uri: http://localhost:9009
-          predicates:
-            - Path=/api/v1/proveedores/**
+        # 1. RUTA DE AUTH: Libre para Login/Registro
         - id: auth-service
           uri: http://localhost:9010
           predicates:
             - Path=/auth/**
 
+        # 2. Vehículo
+        - id: vehiculo-service
+          uri: http://localhost:9001
+          predicates:
+            - Path=/api/v1/vehiculo/**
+          filters:
+            - AuthenticationFilter
+
+        # 3. Cliente
+        - id: cliente-service
+          uri: http://localhost:9002
+          predicates:
+            - Path=/api/v1/clientes/**
+          filters:
+            - AuthenticationFilter
+
+        # 4. Ficha
+        - id: ficha-service
+          uri: http://localhost:9003
+          predicates:
+            - Path=/api/v1/fichas/**
+          filters:
+            - AuthenticationFilter
+
+        # 5. Ventas
+        - id: ventas-service
+          uri: http://localhost:9004
+          predicates:
+            - Path=/api/v1/ventas/**
+          filters:
+            - AuthenticationFilter
+
+        # 6. Financiamiento
+        - id: financiamiento-service
+          uri: http://localhost:9005
+          predicates:
+            - Path=/api/v1/financiamientos/**
+          filters:
+            - AuthenticationFilter
+
+        # 7. Empleado
+        - id: empleado-service
+          uri: http://localhost:9006
+          predicates:
+            - Path=/api/v1/empleados/**
+          filters:
+            - AuthenticationFilter
+
+        # 8. Mantenimiento
+        - id: mantenimiento-service
+          uri: http://localhost:9007
+          predicates:
+            - Path=/api/v1/mantenimientos/**
+          filters:
+            - AuthenticationFilter
+
+        # 9. Inventario
+        - id: inventario-service
+          uri: http://localhost:9008
+          predicates:
+            - Path=/api/v1/inventarios/**
+          filters:
+            - AuthenticationFilter
+
+        # 10. Proveedor
+        - id: proveedor-service
+          uri: http://localhost:9009
+          predicates:
+            - Path=/api/v1/proveedores/**
+          filters:
+            - AuthenticationFilter
+
     discovery:
       locator:
-        enabled: false   
+        enabled: false
         lower-case-service-id: false
 
-    eureka:
-      client:
-        service-url:
-          defaultZone: http://localhost:8761/eureka/
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
-    springdoc:
-      swagger-ui:
-        urls:
-          - name: Vehículo
-            url: /api/v1/vehiculo/v3/api-docs
-          - name: Cliente
-            url: /api/v1/clientes/v3/api-docs
-          - name: Ficha
-            url: /api/v1/fichas/v3/api-docs
-          - name: Ventas
-            url: /api/v1/ventas/v3/api-docs
-          - name: Financiamiento
-            url: /api/v1/financiamientos/v3/api-docs
-          - name: Empleado
-            url: /api/v1/empleados/v3/api-docs
-          - name: Mantenimiento
-            url: /api/v1/mantenimientos/v3/api-docs
-          - name: Inventario
-            url: /api/v1/inventarios/v3/api-docs
-          - name: Proveedor
-            url: /api/v1/proveedores/v3/api-docs
-          - name: Autenticación
-            url: /auth/v3/api-docs      
+springdoc:
+  swagger-ui:
+    urls:
+      - name: Vehículo
+        url: /api/v1/vehiculo/v3/api-docs
+      - name: Cliente
+        url: /api/v1/clientes/v3/api-docs
+      - name: Ficha
+        url: /api/v1/fichas/v3/api-docs
+      - name: Ventas
+        url: /api/v1/ventas/v3/api-docs
+      - name: Financiamiento
+        url: /api/v1/financiamientos/v3/api-docs
+      - name: Empleado
+        url: /api/v1/empleados/v3/api-docs
+      - name: Proveedor
+        url: /api/v1/proveedores/v3/api-docs
+      - name: Inventario
+        url: /api/v1/inventarios/v3/api-docs
+      - name: Mantenimiento
+        url: /api/v1/mantenimientos/v3/api-docs
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.http.server.reactive: DEBUG

@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.automotora.service_ventas.config.ErrorResponse;
@@ -26,7 +27,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 @RequestMapping("/api/v1/ventas")
-@CrossOrigin(origins = "*", methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = "*")
 @Tag(name = "Ventas", description = "Endpoint para la gestión de ventas de vehículos con HATEOAS")
 public class VentaController {
 
@@ -76,6 +77,29 @@ public EntityModel<Venta> obtenerUna(@PathVariable Long id) {
 
     return recurso;
 }
+
+@Operation(
+        summary = "Actualizar venta",
+        description = "Actualiza una venta existente en la base de datos usando su ID y los nuevos datos enviados en el cuerpo de la petición."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Venta actualizada correctamente",
+            content = @Content(mediaType = "application/json",
+                schema = @Schema(implementation = Venta.class))),
+        @ApiResponse(responseCode = "404", description = "Venta no encontrada",
+            content = @Content),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos",
+            content = @Content)
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<Venta> actualizarVenta(
+            @PathVariable Long id,
+            @RequestBody Venta venta) {
+
+        Venta actualizada = ventaService.actualizarVenta(id, venta);
+        return ResponseEntity.ok(actualizada);
+    }
+
 
 
     @DeleteMapping("/{id}")

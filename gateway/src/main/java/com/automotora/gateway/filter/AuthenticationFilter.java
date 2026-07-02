@@ -35,6 +35,16 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
+            String path = exchange.getRequest().getURI().getPath();
+
+            // 🔓 Excluir Swagger y api-docs del filtro
+            if (path.startsWith("/swagger-ui")
+                || path.startsWith("/webjars/swagger-ui")
+                || path.contains("api-docs")) {
+                return chain.filter(exchange); // no valida token
+            }
+
+            // 🔒 Para todo lo demás, validar JWT
             String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -53,13 +63,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 String username = claims.getSubject();
                 List<String> roles = claims.get("roles", List.class);
 
-                // 🔍 Ejemplo de control de privilegios en automotora
-                String path = exchange.getRequest().getURI().getPath();
+                // 🔍 Ejemplo de control de privilegios
                 String method = exchange.getRequest().getMethod().name();
-
-                if (path.startsWith("/api/v1/vehiculos") &&
-                    (method.equals("POST") || method.equals("PUT") || method.equals("DELETE")) &&
-                    roles.contains("CLIENTE")) {
+                if (path.startsWith("/api/v1/vehiculos")
+                    && (method.equals("POST") || method.equals("PUT") || method.equals("DELETE"))
+                    && roles.contains("CLIENTE")) {
 
                     return onError(exchange,
                         "Tu rol CLIENTE no tiene permisos para modificar vehículos. Esta acción está reservada para ADMINISTRADORES.",

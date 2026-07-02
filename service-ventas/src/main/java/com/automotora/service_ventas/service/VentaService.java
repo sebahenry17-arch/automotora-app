@@ -113,4 +113,46 @@ public class VentaService {
 
         return venta;
     }
+    public Venta actualizarVenta(Long id, Venta venta) {
+    Venta existente = ventaRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
+
+    // Actualizar campos básicos
+    existente.setFecha(venta.getFecha());
+    existente.setMonto(venta.getMonto());
+    existente.setClienteId(venta.getClienteId());
+    existente.setFichaId(venta.getFichaId());
+
+    // Enriquecer Cliente
+    if (existente.getClienteId() != null) {
+        try {
+            Object datosCliente = webClientBuilder.build()
+                    .get()
+                    .uri("http://localhost:9002/api/v1/clientes/" + existente.getClienteId())
+                    .retrieve()
+                    .bodyToMono(Object.class)
+                    .block();
+            existente.setDatosCliente(datosCliente);
+        } catch (Exception e) {
+            throw new RuntimeException("Cliente no existe con ID: " + existente.getClienteId());
+        }
+    }
+
+    // Enriquecer FichaVehiculo
+    if (existente.getFichaId() != null) {
+        try {
+            Object datosFicha = webClientBuilder.build()
+                    .get()
+                    .uri("http://localhost:9003/api/v1/fichas/" + existente.getFichaId())
+                    .retrieve()
+                    .bodyToMono(Object.class)
+                    .block();
+            existente.setDatosFichaVehiculo(datosFicha);
+        } catch (Exception e) {
+            throw new RuntimeException("FichaVehiculo no existe con ID: " + existente.getFichaId());
+        }
+    }
+
+    return ventaRepository.save(existente);
+}
 }

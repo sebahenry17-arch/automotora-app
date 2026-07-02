@@ -49,6 +49,34 @@ public class VehiculoService {
 
         return vehiculoRepository.save(vehiculo);
     }
+    @Transactional
+        public Vehiculo actualizarVehiculo(Long id, Vehiculo vehiculo) {
+            Vehiculo existente = vehiculoRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Vehículo no encontrado con ID: " + id));
+
+    // Validaciones básicas
+    if (vehiculo.getMarca() == null || vehiculo.getMarca().isEmpty()) {
+        throw new IllegalArgumentException("La marca no puede estar vacía");
+    }
+    if (vehiculo.getModelo() == null || vehiculo.getModelo().isEmpty()) {
+        throw new IllegalArgumentException("El modelo no puede estar vacío");
+    }
+    if (vehiculo.getAño() < 1900 || vehiculo.getAño() > 2100) {
+        throw new IllegalArgumentException("El año debe estar entre 1900 y 2100");
+    }
+    if (vehiculo.getStock() < 0) {
+        throw new IllegalArgumentException("El stock no puede ser negativo");
+    }
+
+    // Actualizar campos
+    existente.setMarca(vehiculo.getMarca());
+    existente.setModelo(vehiculo.getModelo());
+    existente.setAño(vehiculo.getAño());
+    existente.setStock(vehiculo.getStock());
+    existente.setTipoVehiculo(vehiculo.getTipoVehiculo());
+
+    return vehiculoRepository.save(existente);
+}
 
     @Transactional
     public void eliminar(@NonNull Long id) {

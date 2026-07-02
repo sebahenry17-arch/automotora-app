@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/proveedores")
+@CrossOrigin(origins = "*")
 @Tag(name = "Proveedores", description = "Gestión de proveedores")
 public class ProveedorController {
 
